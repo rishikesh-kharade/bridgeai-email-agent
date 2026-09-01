@@ -19,6 +19,10 @@ def get_users(db: Session):
 def get_user_by_id(db: Session, user_id: int):
     return user_repository.get_user_by_id(db, user_id)
 
+
+def get_user_by_name(db: Session, name: str):
+    return user_repository.get_user_by_name(db, name)
+
 def update_user(db: Session, user: User, user_update: UserUpdate):
     update_data = user_update.model_dump(exclude_unset=True)
 

@@ -27,4 +27,5 @@ def get_user_by_id(db: Session, user_id: int):
     user = db.query(User).filter(User.id == user_id).first()
     return user
 
-
+def get_user_by_name(db: Session, name: str):
+    return db.query(User).filter(User.name == name).first()

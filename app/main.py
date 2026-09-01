@@ -1,15 +1,11 @@
-from fastapi import FastAPI, Depends, HTTPException
-from starlette import status
+from fastapi import FastAPI
 
+import app.models
 from app.core.config import settings
 from app.core.logger import logger
 from sqlalchemy import text
-from app.db.database import engine, Base, get_db
-from app.models.user import User
-from sqlalchemy.orm import Session
-from app.schemas.user import UserCreate, UserUpdate
-from sqlalchemy.exc import IntegrityError
-from app.api.routes import users
+from app.db.database import engine, Base
+from app.api.routes import users, emails, tasks
 
 app = FastAPI(
     title=settings.app_name,
@@ -19,6 +15,8 @@ app = FastAPI(
 )
 
 app.include_router(users.router)
+app.include_router(emails.router)
+app.include_router(tasks.router)
 
 logger.info("Application started successfully")
 
