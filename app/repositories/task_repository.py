@@ -15,3 +15,7 @@ def get_task_count(db: Session, user_id: int):
 def get_task_by_email_id(db: Session, email_id: int):
     return db.query(Task).filter(Task.email_id == email_id).first()
 
+def get_tasks_by_email_id(db: Session, email_id: int):
+    return db.query(Task).filter(Task.email_id == email_id).all()
+
+

@@ -27,5 +27,9 @@ class TaskResponse(BaseModel):
     created_at: datetime
     updated_at: datetime | None = None
 
+    model_config = {
+        "from_attributes": True
+    }
+
 class Config:
     from_attributes = True

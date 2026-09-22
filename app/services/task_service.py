@@ -25,4 +25,7 @@ def get_task_count(db: Session, user_id: int):
 def get_task_by_email_id(db: Session, email_id: int):
     return task_repository.get_task_by_email_id(db, email_id)
 
+def get_tasks_by_email_id(db: Session, email_id: int):
+    return task_repository.get_tasks_by_email_id(db, email_id)
+
 
