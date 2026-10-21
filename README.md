@@ -23,7 +23,7 @@ python -m pip install -r requirements.txt
 copy .env.example .env
 ```
 
-Add your Gemini API key to the ignored `.env` file (or set `GEMINI_API_KEY` in your shell). Never put API keys or OAuth tokens in chat or commit them. To use the real Google integrations, confirm these `.env` settings:
+Each person supplies their own Gemini API key in the ignored `.env` file. Never put API keys or OAuth tokens in chat or commit them. To use the real Google integrations, confirm these `.env` settings:
 
 ```dotenv
 PROVIDER_MODE=gmail
@@ -32,17 +32,17 @@ OAUTH_CREDENTIALS_PATH=credentials/credentials.json
 OAUTH_TOKEN_PATH=token.json
 ```
 
-Place the OAuth desktop client JSON at the ignored `credentials/credentials.json`. Enable Gmail API and Google Tasks API in its Google Cloud project. Run:
+Each person creates and owns a Google Cloud project, enables Gmail API and Google Tasks API, configures their OAuth audience and creates a Desktop app OAuth client. Place that person's downloaded OAuth client JSON at the ignored `credentials/credentials.json`. The first Gmail or Tasks request opens Google consent for that person's account and saves its authorization in the ignored local `token.json`. Follow [SETUP.md](SETUP.md) for the personal-account setup and current OAuth testing limits. Run:
 
 ```powershell
 python run.py
 ```
 
-Open `http://127.0.0.1:<APP_PORT>` (default `8000`). The first email/task request opens the local browser OAuth flow for Gmail read-only and Google Tasks permissions. The OAuth app is Workspace-internal; only accounts allowed by that Workspace audience can authorize. The token is kept in the ignored local token file.
+Open `http://127.0.0.1:<APP_PORT>` (default `8000`). The first email/task request opens the local browser OAuth flow for Gmail read-only and Google Tasks permissions. Each person configures the OAuth audience in their own Cloud project for their account type and saves the resulting token locally. See [SETUP.md](SETUP.md) for details and Google's current testing and verification limits.
 
 ## Distribute to colleagues
 
-For a source handoff, use `dist/bridgeai-project-source-0.1.1.zip`. It contains the project and seven-step setup guide but excludes the local `.env`, OAuth credentials, token, virtual environment, and build caches. The ZIP is a source bundle; it does not contain a wheel. Each colleague extracts it, creates and activates a Python 3.12 virtual environment, installs dependencies with `python -m pip install -r requirements.txt`, and starts the app with `python run.py`. They then configure their own Gemini key, receive the approved OAuth desktop client file through an authorized channel, and complete their own Google authorization.
+For a source handoff, use `dist/bridgeai-project-source-0.1.4.zip`. It contains the project and setup guide but excludes `.env`, OAuth client credentials, `token.json`, virtual environments, and build caches. The ZIP is a source bundle; it does not contain a wheel. Follow [SETUP.md](SETUP.md) to configure Gemini, Google Cloud APIs, OAuth, and the local app.
 
 A wheel is a separate optional package artifact. It can be built with `python -m pip wheel --no-deps --no-build-isolation --wheel-dir dist .`; it is not included in the source ZIP or published to PyPI.
 
@@ -66,6 +66,6 @@ Unit/integration adapter tests use mocked Google/Gemini behavior. Live Gmail and
 ## Limits
 
 - This app has no API login or tenant controls; keep it bound to loopback.
-- The Workspace OAuth audience limits which accounts can install/authorize it.
+- Each installation's OAuth audience and Google verification status determine which accounts can authorize it. This guide assumes the buyer configures and uses their own project for personal use.
 - An OAuth token file grants the configured access to the signed-in person's account; keep it private.
 - No tasks are assigned to other people; the Google Tasks integration is for the local user's own tasks.
