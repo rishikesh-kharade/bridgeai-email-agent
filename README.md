@@ -42,7 +42,7 @@ Open `http://127.0.0.1:<APP_PORT>` (default `8000`). The first email/task reques
 
 ## Distribute to colleagues
 
-For a source handoff, use `dist/bridgeai-project-source-0.1.4.zip`. It contains the project and setup guide but excludes `.env`, OAuth client credentials, `token.json`, virtual environments, and build caches. The ZIP is a source bundle; it does not contain a wheel. Follow [SETUP.md](SETUP.md) to configure Gemini, Google Cloud APIs, OAuth, and the local app.
+For a source handoff, use `dist/bridgeai-project-source-0.1.5.zip`. It contains the project and setup guide but excludes `.env`, OAuth client credentials, `token.json`, virtual environments, and build caches. The ZIP is a source bundle; it does not contain a wheel. Follow [SETUP.md](SETUP.md) for Windows or macOS instructions to configure Gemini, Google Cloud APIs, OAuth, and the local app.
 
 A wheel is a separate optional package artifact. It can be built with `python -m pip wheel --no-deps --no-build-isolation --wheel-dir dist .`; it is not included in the source ZIP or published to PyPI.
 
