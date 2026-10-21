@@ -1,0 +1,17 @@
+.venv/
+.idea/
+.env
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+build/
+dist/
+*.egg-info/
+# Gmail OAuth credentials
+credentials/
+token.json
+tokens/
+credentials.json

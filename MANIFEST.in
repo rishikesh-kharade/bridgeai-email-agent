@@ -1,0 +1,11 @@
+include README.md SETUP.md .env.example requirements.txt run.py
+recursive-include app *.py
+recursive-include app/static *.html
+prune .venv
+prune .git
+prune dist
+prune build
+prune credentials
+prune tests
+exclude .env
+exclude token.json
