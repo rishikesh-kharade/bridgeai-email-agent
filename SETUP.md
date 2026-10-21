@@ -11,13 +11,17 @@ Use these steps for a single person's Windows computer. Each person connects the
    .\.venv\Scripts\Activate.ps1
    ```
 
-3. **Install dependencies.** For the source project, run `python -m pip install -r requirements.txt`. For the ZIP bundle, install its included wheel with `python -m pip install .\bridgeai_email_assistant-0.1.0-py3-none-any.whl`.
+3. **Install dependencies.** The shared ZIP is a source bundle and does not contain a Python wheel. Run this from the extracted project folder:
+
+   ```powershell
+   python -m pip install -r requirements.txt
+   ```
 
 4. **Create local settings.** Run `copy .env.example .env`. In `.env`, set `PROVIDER_MODE=gmail`, `TASK_PROVIDER_MODE=google_tasks`, and the person's own `GEMINI_API_KEY`. Keep `.env` private; never send it with the project.
 
 5. **Configure Google access.** Obtain the approved OAuth desktop client file for the BridgeAI Google Cloud project through your organization's approved channel and save it as `credentials\credentials.json`. Ensure Gmail API and Google Tasks API are enabled. This OAuth app is currently **Internal**, so the signing-in account must be permitted by its Workspace organization. Never distribute `token.json` or commit the credentials file.
 
-6. **Start BridgeAI and open the local site.** Run `python run.py` from the source project, or `bridgeai` from the installed bundle. Open `http://127.0.0.1:8000`. If port 8000 is busy, set `APP_PORT=8001` in `.env` and open `http://127.0.0.1:8001`. Leave the terminal open while using the app.
+6. **Start BridgeAI and open the local site.** From the extracted source project folder, run `python run.py`. Open `http://127.0.0.1:8000`. If port 8000 is busy, set `APP_PORT=8001` in `.env` and open `http://127.0.0.1:8001`. Leave the terminal open while using the app.
 
 7. **Authorize and check it.** Complete Google's browser consent using the intended Workspace account. Confirm recent emails load, then try a summary or ask `Show my tasks`. Email content is sent to Gemini when requesting a summary, question, or analysis. Task creation is a separate explicit action and only creates an email follow-up if the deterministic rules approve it.
 

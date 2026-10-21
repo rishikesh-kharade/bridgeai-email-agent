@@ -42,9 +42,9 @@ Open `http://127.0.0.1:<APP_PORT>` (default `8000`). The first email/task reques
 
 ## Distribute to colleagues
 
-For a source handoff, use `dist/bridgeai-project-source-0.1.0.zip`. It contains the project and seven-step setup guide but excludes the local `.env`, OAuth credentials, token, virtual environment, and build caches. Each colleague installs dependencies, configures their own Gemini key, receives the approved OAuth desktop client file through an authorized channel, and completes their own Google authorization. The portable wheel can also be built with `python -m pip wheel --no-deps --no-build-isolation --wheel-dir dist .`; it is not published to PyPI.
+For a source handoff, use `dist/bridgeai-project-source-0.1.1.zip`. It contains the project and seven-step setup guide but excludes the local `.env`, OAuth credentials, token, virtual environment, and build caches. The ZIP is a source bundle; it does not contain a wheel. Each colleague extracts it, creates and activates a Python 3.12 virtual environment, installs dependencies with `python -m pip install -r requirements.txt`, and starts the app with `python run.py`. They then configure their own Gemini key, receive the approved OAuth desktop client file through an authorized channel, and complete their own Google authorization.
 
-For a colleague installing the bundle: extract it, create/activate a Python 3.12 virtual environment, then run `python -m pip install .\bridgeai_email_assistant-0.1.0-py3-none-any.whl`. Copy `.env.example` to `.env`, add their own Gemini API key and OAuth client file, then run `bridgeai` from that configured folder. They authorize their own Google account in the browser.
+A wheel is a separate optional package artifact. It can be built with `python -m pip wheel --no-deps --no-build-isolation --wheel-dir dist .`; it is not included in the source ZIP or published to PyPI.
 
 ## Use
 
