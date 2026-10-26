@@ -1,10 +1,10 @@
-from app.integrations.email.local_provider import InMemoryEmailProvider
-from app.integrations.tasks.local_provider import InMemoryTaskProvider
+from tests.fakes import FakeEmailProvider
+from tests.fakes import FakeTaskProvider
 from app.schemas.email import Email
 
 
 def test_email_provider():
-    provider = InMemoryEmailProvider([Email(
+    provider = FakeEmailProvider([Email(
         id="1", provider_message_id="1", sender="a@example.com",
         receiver="b@example.com", subject="Hello", body="Body"
     )])
@@ -13,5 +13,5 @@ def test_email_provider():
 
 
 def test_task_provider():
-    provider = InMemoryTaskProvider()
-    assert provider.get_task_count() == 0
+    provider = FakeTaskProvider()
+    assert provider.list_tasks() == []

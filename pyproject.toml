@@ -4,8 +4,9 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "bridgeai-email-assistant"
-version = "0.1.0"
-description = "A personal, local Gmail and Google Tasks assistant"
+version = "2.0.0"
+description = "A local AI email assistant with Google integrations"
+readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
   "fastapi",
@@ -21,6 +22,9 @@ dependencies = [
   "email-validator",
 ]
 
+[project.optional-dependencies]
+dev = ["pytest", "httpx"]
+
 [project.scripts]
 bridgeai = "app.cli:main"
 
@@ -34,10 +38,12 @@ packages = [
   "app.integrations",
   "app.integrations.email",
   "app.integrations.google",
+  "app.integrations.calendar",
   "app.integrations.tasks",
   "app.schemas",
   "app.services",
+  "app.prompts",
 ]
 
 [tool.setuptools.package-data]
-app = ["static/*.html"]
+app = ["static/*.html", "static/react-ui/*.html", "static/react-ui/assets/*"]

@@ -1,6 +1,8 @@
 .venv/
 .idea/
 .env
+.env.*
+!.env.example
 __pycache__/
 *.py[cod]
 .pytest_cache/
@@ -10,8 +12,12 @@ htmlcov/
 build/
 dist/
 *.egg-info/
+frontend/node_modules/
+*.tsbuildinfo
 # Gmail OAuth credentials
 credentials/
 token.json
+token*.json
 tokens/
+*.log
 credentials.json

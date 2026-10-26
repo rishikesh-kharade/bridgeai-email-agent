@@ -63,7 +63,7 @@
     const target=byId('emails'); empty(target,'Loading…');
     try {
       const emails=await api('/emails?limit=10'); target.replaceChildren();
-      if (!emails.length) return empty(target,'No emails found. If Gmail is not connected yet, set PROVIDER_MODE=gmail and refresh.');
+      if (!emails.length) return empty(target,'No emails found. Connect your Google account and refresh.');
       for (const email of emails) {
         const row=document.createElement('article'); row.className='email';
         const title=document.createElement('div'); title.className='email-title'; title.textContent=email.subject || '(no subject)';

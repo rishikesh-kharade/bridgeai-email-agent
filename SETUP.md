@@ -1,4 +1,4 @@
-# BridgeAI setup
+# BridgeAI Email Agent setup
 
 Choose the instructions for your operating system. Keep the extracted project folder on your computer; do not run the application from inside the ZIP file.
 
@@ -6,7 +6,7 @@ Choose the instructions for your operating system. Keep the extracted project fo
 
 ## 1. Install Python and extract the project
 
-Install Python 3.12 or newer. During installation, enable **Add Python to PATH**. Extract the project ZIP to a folder, for example `C:\BridgeAI`.
+Install Python 3.12 or newer. During Python installation, enable **Add Python to PATH**. Extract the project ZIP to a folder, for example `C:\BridgeAI`. The ZIP includes the built interface, so Node.js is not needed to run the app; install Node.js LTS only if you plan to change and rebuild the interface.
 
 ## 2. Open PowerShell and install the dependencies
 
@@ -18,6 +18,8 @@ py -3.12 -m venv .venv
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
+
+If you edit the React interface, rebuild it from the `frontend` folder with `npm.cmd ci` and `npm.cmd run build` before starting BridgeAI.
 
 If PowerShell blocks activation, run this once in that PowerShell window, then activate the environment again:
 
@@ -39,9 +41,9 @@ Gemini API usage is subject to the quota and billing settings for the project as
 1. Open the [Google Cloud Console](https://console.cloud.google.com/).
 2. Create or select a project.
 3. Open **APIs & Services → Library**.
-4. Enable **Gmail API** and **Google Tasks API** for that project.
+4. Enable **Gmail API** and **Google Tasks API** for that project. Enable **Google Calendar API** only if you want meeting features.
 
-## 5. Configure OAuth for Gmail and Google Tasks
+## 5. Configure OAuth for Gmail, Google Tasks, and Google Calendar
 
 1. In Google Cloud Console, open **Google Auth Platform** (or **APIs & Services → OAuth consent screen**).
 2. Complete the app name, support email, and developer contact details under **Branding**.
@@ -49,6 +51,7 @@ Gemini API usage is subject to the quota and billing settings for the project as
 4. Under **Data Access**, add these scopes:
    - `https://www.googleapis.com/auth/gmail.readonly`
    - `https://www.googleapis.com/auth/tasks`
+   - Optional: `https://www.googleapis.com/auth/calendar.events.readonly`
 5. Open **Clients**, choose **Create client**, select **Desktop app**, and create the client.
 6. Download the OAuth client JSON file.
 
@@ -65,10 +68,9 @@ Copy-Item .env.example .env
 Open `.env` in a text editor and set `GEMINI_API_KEY` to the key created in Step 3. Keep these integration settings:
 
 ```dotenv
-PROVIDER_MODE=gmail
-TASK_PROVIDER_MODE=google_tasks
 OAUTH_CREDENTIALS_PATH=credentials/credentials.json
 OAUTH_TOKEN_PATH=token.json
+CALENDAR_ENABLED=false
 ```
 
 Save the file. Do not share `.env` or add it to Git.
@@ -91,9 +93,9 @@ Start the app from the activated PowerShell environment:
 python run.py
 ```
 
-Open `http://127.0.0.1:8000` in your browser. When you first request email or task data, a Google authorization page opens. Sign in to the Google account you added as a test user, review the requested Gmail read-only and Google Tasks access, and allow it. The authorization is saved locally in `token.json`.
+Open `http://127.0.0.1:8000` in your browser. The first request for email or task data opens Google authorization. Sign in to the Google account configured in your OAuth project and allow Gmail read-only and Google Tasks access. If you enabled Calendar, allow its event read-only scope as well. The authorization is saved locally in `token.json`.
 
-Use **Refresh** to load recent email and tasks. You can also ask BridgeAI to list recent emails, summarize a selected email, or analyze an email and create an eligible task.
+Use the chat filters or ask for recent email, tasks, or upcoming meetings in your own words. You can also search by sender or topic, for example “Is there any email from HOPR?” Open an email card to read the full message; choose **Review email** for a summary and action assessment, or **Create eligible task** to evaluate whether a task should be created. You may give an eligible task a custom title in chat.
 
 ## macOS
 
@@ -101,7 +103,7 @@ Follow these steps on a Mac. The Google AI Studio and Google Cloud steps are the
 
 ### 1. Install Python and extract the project
 
-Install Python 3.12 or newer from [python.org](https://www.python.org/downloads/macos/) or with a package manager such as Homebrew. Extract the project ZIP in Finder, then open Terminal and change to the extracted `bridgeai-email-agent` folder. For example:
+Install Python 3.12 or newer from [python.org](https://www.python.org/downloads/macos/) or with a package manager such as Homebrew. Extract the project ZIP in Finder, then open Terminal and change to the extracted `bridgeai-email-agent` folder. The ZIP includes the built interface, so Node.js is needed only if you plan to change and rebuild the interface. For example:
 
 ```bash
 cd ~/Downloads/bridgeai-email-agent
@@ -121,6 +123,8 @@ python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
 
+If you edit the React interface, install Node.js LTS and rebuild it from the `frontend` folder with `npm ci` and `npm run build` before starting BridgeAI.
+
 Keep using this Terminal window with `(.venv)` active when running BridgeAI.
 
 ### 3. Create a Gemini API key
@@ -137,9 +141,9 @@ Gemini API usage is subject to the quota and billing settings for the project as
 1. Open the [Google Cloud Console](https://console.cloud.google.com/).
 2. Create or select a project.
 3. Open **APIs & Services → Library**.
-4. Enable **Gmail API** and **Google Tasks API** for that project.
+4. Enable **Gmail API** and **Google Tasks API** for that project. Enable **Google Calendar API** only if you want meeting features.
 
-### 5. Configure OAuth for Gmail and Google Tasks
+### 5. Configure OAuth for Gmail, Google Tasks, and Google Calendar
 
 1. In Google Cloud Console, open **Google Auth Platform** (or **APIs & Services → OAuth consent screen**).
 2. Complete the app name, support email, and developer contact details under **Branding**.
@@ -147,6 +151,7 @@ Gemini API usage is subject to the quota and billing settings for the project as
 4. Under **Data Access**, add these scopes:
    - `https://www.googleapis.com/auth/gmail.readonly`
    - `https://www.googleapis.com/auth/tasks`
+   - Optional: `https://www.googleapis.com/auth/calendar.events.readonly`
 5. Open **Clients**, choose **Create client**, select **Desktop app**, and create the client.
 6. Download the OAuth client JSON file.
 
@@ -163,10 +168,9 @@ cp .env.example .env
 Open `.env` in a text editor and set `GEMINI_API_KEY` to the key created in Step 3. Keep these integration settings:
 
 ```dotenv
-PROVIDER_MODE=gmail
-TASK_PROVIDER_MODE=google_tasks
 OAUTH_CREDENTIALS_PATH=credentials/credentials.json
 OAUTH_TOKEN_PATH=token.json
+CALENDAR_ENABLED=false
 ```
 
 Save the file. Do not share `.env` or add it to Git.
@@ -189,11 +193,21 @@ With `(.venv)` active, start the app:
 python run.py
 ```
 
-Open `http://127.0.0.1:8000` in your browser. When you first request email or task data, a Google authorization page opens. Sign in to the Google account you added as a test user, review the requested Gmail read-only and Google Tasks access, and allow it. The authorization is saved locally in `token.json`.
+Open `http://127.0.0.1:8000` in your browser. The first request for email or task data opens Google authorization. Sign in to the Google account configured in your OAuth project and allow Gmail read-only and Google Tasks access. If you enabled Calendar, allow its event read-only scope as well. The authorization is saved locally in `token.json`.
 
-Use **Refresh** to load recent email and tasks. You can also ask BridgeAI to list recent emails, summarize a selected email, or analyze an email and create an eligible task.
+Use the chat filters or type a request to list emails, view tasks, or show upcoming meetings. Open an email card to read the full message; choose **Review email** for a summary and action assessment, or **Create eligible task** to evaluate whether a task should be created. You may give an eligible task a custom title in chat.
+
+## Chat filters
+
+- **Unread important** reviews up to 20 recent unread messages with Gemini and shows only those rated High or Critical, including their summaries. This is an AI urgency estimate and does not depend on Gmail's IMPORTANT label.
+- **Escalated emails** and **Customer emails** are classified by Gemini from short excerpts of up to 20 recent unread messages; Gmail labels are not required. Escalated means an unresolved issue appears to be raised for higher-level help. Customer is inferred from the message and sender context because the app has no customer directory, so either filter can make mistakes. The general attention request reviews up to 10 recent unread messages. Chat requests and these excerpts are sent to Gemini for AI processing.
+- **Tasks assigned to me** lists tasks in the connected Google Tasks account. Tasks are personal to that account; BridgeAI does not assign tasks to other people.
+- **My meetings** lists events on the primary Google Calendar for the next 14 days. Calendar access is read-only.
+- Custom filters save a name and instruction in this browser's local storage. They are shortcuts for Email Agent prompts, not Gmail labels or a separate server-side filter database.
 
 ## Data and access notes
+
+- The terminal and rotating log file record workflow steps, tool/provider operations, outcomes, safe error types, and durations. They do not record chat prompts or email bodies. On Windows the default log is `%LOCALAPPDATA%\BridgeAI Email Agent\logs\bridgeai.log`; on macOS it is `~/Library/Logs/BridgeAI Email Agent/logs/bridgeai.log`; on Linux it is `$XDG_STATE_HOME/BridgeAI Email Agent/logs/bridgeai.log` (or `~/.local/state/...` when `XDG_STATE_HOME` is unset). Set `LOG_FILE_PATH` to use a different file.
 
 - Gmail access is read-only. Tasks are saved to the Google Tasks account authorized above.
 - BridgeAI sends email content to Gemini when you request a summary, analysis, or email question-answering.

@@ -1,4 +1,3 @@
-"""Command-line entry point for the per-user local web app."""
 import uvicorn
 from app.core.config import settings
 

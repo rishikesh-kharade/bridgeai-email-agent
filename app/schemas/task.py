@@ -16,8 +16,3 @@ class TaskCreate(BaseModel):
     description: str = Field(min_length=1, max_length=10000)
     status: str = "pending"
     priority: str = "normal"
-
-
-class TaskUpdate(BaseModel):
-    status: str | None = None
-    priority: str | None = None

@@ -1,11 +1,11 @@
 from app.agents.graph import build_graph
-from app.integrations.email.local_provider import InMemoryEmailProvider
-from app.integrations.tasks.local_provider import InMemoryTaskProvider
+from tests.fakes import FakeEmailProvider
+from tests.fakes import FakeTaskProvider
 
 
 def test_graph_can_compile_without_client_data():
     graph = build_graph(
-        InMemoryEmailProvider(),
-        InMemoryTaskProvider(),
+        FakeEmailProvider(),
+        FakeTaskProvider(),
     )
     assert graph is not None

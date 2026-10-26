@@ -1,9 +1,9 @@
-"""Read-only Gmail adapter implementing the project's EmailProvider contract."""
+"""Read-only Gmail access for the local single-user application."""
 import base64
 from datetime import datetime, timezone
 from email.utils import getaddresses
 from app.integrations.google.oauth import GoogleOAuthManager
-from app.schemas.email import Email, EmailCreate, EmailUpdate
+from app.schemas.email import Email
 
 
 class GmailProviderError(RuntimeError):
@@ -15,6 +15,11 @@ class GmailAuthorizationError(GmailProviderError):
 
 
 class GmailEmailProvider:
+    FILTER_QUERIES = {
+        "important_unread": "is:unread is:important to:me",
+        "unread": "is:unread",
+    }
+
     def __init__(self, service=None, service_factory=None):
         self._service = service
         self._service_factory = service_factory
@@ -95,16 +100,17 @@ class GmailEmailProvider:
             raise GmailProviderError("Gmail message retrieval failed.") from exc
         return self.map_message(raw)
 
-    def list_emails(self, limit: int = 50) -> list[Email]:
+    def list_emails(self, limit: int = 50, *, query: str | None = None) -> list[Email]:
         if not 1 <= limit <= 500:
             raise ValueError("Email list limit must be between 1 and 500.")
         try:
             refs = []
             page_token = None
             while len(refs) < limit:
-                result = self._gmail.users().messages().list(
-                    userId="me", maxResults=min(100, limit - len(refs)), pageToken=page_token
-                ).execute()
+                args = {"userId": "me", "maxResults": min(100, limit - len(refs)), "pageToken": page_token}
+                if query:
+                    args["q"] = query
+                result = self._gmail.users().messages().list(**args).execute()
                 refs.extend(result.get("messages", []))
                 page_token = result.get("nextPageToken")
                 if not page_token:
@@ -120,11 +126,17 @@ class GmailEmailProvider:
         except Exception as exc:
             raise GmailProviderError("Gmail message listing failed.") from exc
 
-    def create_email(self, email: EmailCreate) -> Email:
-        raise GmailProviderError("Gmail adapter is read-only.")
+    def list_filtered_emails(self, filter_id: str, limit: int = 20) -> list[Email]:
+        query = self.FILTER_QUERIES.get(filter_id)
+        if query is None:
+            raise ValueError("Unsupported email filter.")
+        return self.list_emails(limit, query=query)
 
-    def update_email(self, email_id: str, email_update: EmailUpdate) -> Email | None:
-        raise GmailProviderError("Gmail adapter is read-only.")
-
-    def mark_as_read(self, email_id: str) -> Email | None:
-        raise GmailProviderError("Gmail adapter is read-only.")
+    def search_emails(self, query: str, limit: int = 10, *, sender_only: bool = False) -> list[Email]:
+        clean_query = " ".join(str(query).split()).replace('"', "").replace("\\", "")
+        if not clean_query or len(clean_query) > 200:
+            raise ValueError("Email search query must contain between 1 and 200 characters.")
+        if not 1 <= limit <= 500:
+            raise ValueError("Email search limit must be between 1 and 500.")
+        gmail_query = f'from:"{clean_query}"' if sender_only else f'"{clean_query}"'
+        return self.list_emails(limit, query=gmail_query)

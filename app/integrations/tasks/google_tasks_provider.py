@@ -90,18 +90,6 @@ class GoogleTasksProvider:
             if not token:
                 break
 
-    def get_task(self, task_id: str) -> Task | None:
-        tasklist_id = self._tasklist()
-        if not tasklist_id:
-            return None
-        try:
-            raw = self._api.tasks().get(tasklist=tasklist_id, task=task_id).execute()
-            return self._map(raw)
-        except Exception as exc:
-            if getattr(exc, "resp", None) is not None and getattr(exc.resp, "status", None) == 404:
-                return None
-            raise GoogleTasksProviderError("Google Task could not be retrieved.") from exc
-
     def list_tasks(self) -> list[Task]:
         tasklist_id = self._tasklist()
         if not tasklist_id:
@@ -110,16 +98,6 @@ class GoogleTasksProvider:
             return [self._map(raw) for raw in self._all_raw_tasks(tasklist_id)]
         except Exception as exc:
             raise GoogleTasksProviderError("Google Tasks could not be listed.") from exc
-
-    def find_existing_task(self, email_id: str, title: str) -> Task | None:
-        normalized = " ".join(title.lower().split())
-        for task in self.list_tasks():
-            if task.source_email_id == str(email_id) and " ".join(task.title.lower().split()) == normalized:
-                return task
-        return None
-
-    def create_task(self, task: TaskCreate) -> Task:
-        return self.create_task_if_absent(task)[0]
 
     def create_task_if_absent(self, task: TaskCreate) -> tuple[Task, bool]:
         with self._lock:
@@ -144,6 +122,3 @@ class GoogleTasksProvider:
                 raise
             except Exception as exc:
                 raise GoogleTasksProviderError("Google Task could not be created.") from exc
-
-    def get_task_count(self) -> int:
-        return len(self.list_tasks())

@@ -13,6 +13,9 @@ class GoogleOAuthManager:
         self.credentials_path = Path(settings.oauth_credentials_path)
         self.token_path = Path(settings.oauth_token_path)
         self.scopes = list(settings.oauth_scopes)
+        calendar_scope = "https://www.googleapis.com/auth/calendar.events.readonly"
+        if settings.calendar_enabled and calendar_scope not in self.scopes:
+            self.scopes.append(calendar_scope)
         self.timeout = settings.request_timeout
         self._credentials = None
         self._lock = threading.Lock()

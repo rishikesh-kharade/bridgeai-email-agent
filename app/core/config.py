@@ -1,5 +1,6 @@
 from typing import Literal
-from pydantic import Field, model_validator
+
+from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -9,18 +10,15 @@ class Settings(BaseSettings):
     app_version: str = "2.0.0"
     app_port: int = Field(default=8000, ge=1024, le=65535)
     environment: Literal["development", "test", "production"] = "development"
-    debug: bool = False
 
     # Logging
     log_level: str = "INFO"
+    log_file_path: str | None = None
 
     # Gemini
     gemini_api_key: str | None = None
-    gemini_model: str = "gemini-3.6-flash"
-    gemini_temperature: float = 0.1
-
-    # Provider configuration
-    provider_mode: Literal["memory", "gmail"] = "memory"
+    gemini_model: str = Field(default="gemini-3.6-flash", min_length=1, max_length=100)
+    gemini_temperature: float = Field(default=0.1, ge=0, le=2)
 
     # OAuth
     oauth_credentials_path: str = "credentials/credentials.json"
@@ -31,21 +29,29 @@ class Settings(BaseSettings):
     ]
 
     # Timeouts (seconds)
-    request_timeout: float = 30.0
-    gemini_timeout: float = 60.0
+    request_timeout: float = Field(default=30.0, gt=0, le=120)
+    gemini_timeout: float = Field(default=60.0, gt=0, le=300)
     max_email_body_chars: int = Field(default=30000, ge=1000, le=100000)
-    task_provider_mode: Literal["memory", "google_tasks"] = "memory"
+    calendar_enabled: bool = False
 
     # Limits
     max_email_list_limit: int = Field(default=100, ge=1, le=500)
     default_email_list_limit: int = Field(default=50, ge=1, le=100)
+    max_email_filter_scan: int = Field(default=20, ge=1, le=20)
+
+    @field_validator("log_level")
+    @classmethod
+    def validate_log_level(cls, value: str) -> str:
+        normalized = value.strip().upper()
+        if normalized not in {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}:
+            raise ValueError("LOG_LEVEL must be DEBUG, INFO, WARNING, ERROR, or CRITICAL.")
+        return normalized
 
     @model_validator(mode="after")
-    def validate_provider_configuration(self):
+    def validate_production_configuration(self):
         if self.environment == "production":
-            if self.provider_mode != "gmail":
-                raise ValueError("Production requires PROVIDER_MODE=gmail; memory providers are development-only.")
-            raise ValueError("Production deployment is disabled until authentication and tenant authorization are implemented.")
+            if not self.gemini_api_key or not self.gemini_api_key.strip():
+                raise ValueError("Production requires GEMINI_API_KEY.")
         return self
 
     model_config = SettingsConfigDict(
@@ -53,12 +59,5 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         extra="ignore",
     )
-
-    def is_production(self) -> bool:
-        return self.environment == "production"
-
-    def is_test(self) -> bool:
-        return self.environment == "test"
-
 
 settings = Settings()

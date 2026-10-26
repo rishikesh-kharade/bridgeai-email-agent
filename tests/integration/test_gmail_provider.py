@@ -116,12 +116,47 @@ def test_list_follows_next_page_token():
     assert messages.calls == [None, "next"]
 
 
-def test_rejects_malformed_messages_and_writes():
+def test_filtered_email_queries_use_fixed_gmail_searches():
+    class QueryMessages(Messages):
+        def __init__(self):
+            self.query = None
+
+        def list(self, **kwargs):
+            self.query = kwargs.get("q")
+            return Request({"messages": []})
+
+    for filter_id, expected in {
+        "important_unread": "is:unread is:important to:me",
+        "unread": "is:unread",
+    }.items():
+        messages = QueryMessages()
+        GmailEmailProvider(Service(messages)).list_filtered_emails(filter_id)
+        assert messages.query == expected
+
+
+def test_search_emails_builds_sender_or_full_text_search():
+    class QueryMessages(Messages):
+        def __init__(self):
+            self.query = None
+
+        def list(self, **kwargs):
+            self.query = kwargs.get("q")
+            return Request({"messages": []})
+
+    messages = QueryMessages()
+    provider = GmailEmailProvider(Service(messages))
+    assert provider.search_emails("HOPR", sender_only=True) == []
+    assert messages.query == 'from:"HOPR"'
+    assert provider.search_emails("FA_2 Product Data", sender_only=False) == []
+    assert messages.query == '"FA_2 Product Data"'
+
+
+def test_rejects_malformed_messages_and_exposes_no_email_write_operations():
     with pytest.raises(GmailProviderError):
         GmailEmailProvider.map_message({})
     provider = GmailEmailProvider(Service(Messages()))
-    with pytest.raises(GmailProviderError, match="read-only"):
-        provider.mark_as_read("abc")
+    assert not hasattr(provider, "mark_as_read")
+    assert not hasattr(provider, "create_email")
 
 
 def test_provider_errors_are_sanitized():

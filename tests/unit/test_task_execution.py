@@ -1,10 +1,10 @@
-from app.integrations.tasks.local_provider import InMemoryTaskProvider
+from tests.fakes import FakeTaskProvider
 from app.schemas.ai_analysis import AIAnalysis, AICategory
 from app.services.task_execution_service import create_tasks_if_needed
 
 
 def test_task_execution_is_idempotent_for_same_email_and_action():
-    provider = InMemoryTaskProvider()
+    provider = FakeTaskProvider()
     analysis = AIAnalysis(
         summary="Review the request.",
         category=AICategory(main="Operations"),
@@ -33,8 +33,23 @@ def test_no_action_items_fails_closed():
         action_items=[],
     )
     result = create_tasks_if_needed(
-        InMemoryTaskProvider(), email_id="mail-2",
+        FakeTaskProvider(), email_id="mail-2",
         subject="Unclear", analysis=analysis,
     )
     assert result.task_created is False
     assert "no validated action items" in result.decision.reason
+
+
+def test_custom_title_is_used_only_after_deterministic_approval():
+    provider = FakeTaskProvider()
+    analysis = AIAnalysis(
+        summary="Review the note.", category=AICategory(main="Operations"),
+        priority="Low", sentiment="Neutral", requires_action=True,
+        requires_attention=True, action_items=["Review the note"],
+    )
+    result = create_tasks_if_needed(
+        provider, email_id="mail-3", subject="Note", analysis=analysis,
+        task_title="Named follow-up",
+    )
+    assert result.task_created is False
+    assert provider.list_tasks() == []

@@ -1,6 +1,6 @@
-include README.md SETUP.md .env.example requirements.txt run.py
+include README.md SETUP.md ARCHITECTURE.md PRODUCTION_READINESS.md .env.example requirements.txt requirements-dev.txt run.py
 recursive-include app *.py
-recursive-include app/static *.html
+recursive-include app/static *
 prune .venv
 prune .git
 prune dist
